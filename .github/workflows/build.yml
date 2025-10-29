@@ -1,0 +1,107 @@
+name: 🏗️ Build and Release Infodazz Face & School (from infodazz_school/arun-dev)
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types: [build-face, trigger-build]
+  push:
+    tags:
+      - "face-v*"
+
+jobs:
+  # =========================================================
+  # 🏫 BUILD & RELEASE - SCHOOL
+  # =========================================================
+  build-school:
+    if: |
+      contains(github.ref, 'refs/tags/face-v') ||
+      (github.event_name == 'repository_dispatch' && github.event.action == 'build-face') ||
+      (github.event_name == 'repository_dispatch' && github.event.action == 'trigger-build')
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      # 1️⃣ Checkout SOURCE CODE (from RVK repo, branch arun-dev-2)
+      - name: 📦 Checkout School Source Code
+        uses: actions/checkout@v4
+        with:
+          repository: kittle-arunkarthik/infodazz_school
+          ref: arun-dev
+          token: ${{ secrets.SOURCE_REPO_TOKEN }}
+          fetch-depth: 0
+
+      # 2️⃣ Setup Node.js
+      - name: ⚙️ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: "electron/package-lock.json"
+
+      # 3️⃣ Install Electron dependencies
+      - name: ⚡ Install Electron dependencies
+        run: |
+          cd electron
+          npm ci
+
+      # 4️⃣ Build React apps (SCHOOL + FACE)
+      - name: 🧱 Build React apps (SCHOOL + FACE)
+        shell: bash
+        run: |
+          echo "📦 Building SCHOOL and FACE React apps on $RUNNER_OS"
+
+          # === SCHOOL BUILD ===
+          cd SCHOOL/client
+
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            echo "🪟 Installing Bun on Windows..."
+            powershell -Command "irm bun.sh/install.ps1 | iex"
+
+            # ✅ Explicitly configure Bun path
+            export BUN_INSTALL="$USERPROFILE\\.bun"
+            export PATH="$BUN_INSTALL\\bin:$PATH"
+
+            echo "✅ Bun installed at $BUN_INSTALL"
+            ls "$BUN_INSTALL\\bin"
+          else
+            echo "🐧 Installing Bun on Linux/macOS..."
+            curl -fsSL https://bun.sh/install | bash
+            export BUN_INSTALL="$HOME/.bun"
+            export PATH="$BUN_INSTALL/bin:$PATH"
+          fi
+
+          echo "⚙️ Installing dependencies & building SCHOOL..."
+          "$BUN_INSTALL/bin/bun" install --no-save
+          "$BUN_INSTALL/bin/bun" run build
+
+          # === FACE BUILD ===
+          cd ../../FACE/client
+          echo "⚙️ Installing dependencies & building FACE..."
+          npm ci || npm install
+          npm run build
+
+          # Back to electron folder
+          cd ../../electron
+
+      # 5️⃣ Build and Publish Infodazz Face app
+      - name: 🏫 Build Infodazz Face
+        run: |
+          echo "🚀 Building Infodazz School for ${{ matrix.os }}"
+          cd electron
+          npx electron-builder --config electron-builder-face.yml --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          EP_DRAFT: false
+          EP_PRE_RELEASE: false
+          DEBUG: electron-builder
+
+      # 6️⃣ Upload combined build artifacts (for inspection/debugging)
+      - name: 📤 Upload Face Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Infodazz-Face-${{ matrix.os }}-${{ github.ref_name }}
+          path: electron/release/face/
