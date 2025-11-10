@@ -1,4 +1,4 @@
-name: 🏗️ Build and Release Infodazz Face & School (from infodazz_erp/arun-dev)
+name: 🏗️ Build and Release Infodazz Face & Erp (from infodazz_erp/arun-dev)
 
 on:
   workflow_dispatch:
@@ -10,7 +10,7 @@ on:
 
 jobs:
   # =========================================================
-  # 🏫 BUILD & RELEASE - SCHOOL
+  # 🏫 BUILD & RELEASE - ERP
   # =========================================================
   build-school:
     if: |
@@ -25,7 +25,7 @@ jobs:
 
     steps:
       # 1️⃣ Checkout SOURCE CODE (from RVK repo, branch arun-dev-2)
-      - name: 📦 Checkout School Source Code
+      - name: 📦 Checkout Erp Source Code
         uses: actions/checkout@v4
         with:
           repository: kittle-arunkarthik/infodazz_erp
@@ -47,14 +47,14 @@ jobs:
           cd electron
           npm ci
 
-      # 4️⃣ Build React apps (SCHOOL + FACE)
-      - name: 🧱 Build React apps (SCHOOL + FACE)
+      # 4️⃣ Build React apps (ERP + FACE)
+      - name: 🧱 Build React apps (ERP + FACE)
         shell: bash
         run: |
-          echo "📦 Building SCHOOL and FACE React apps on $RUNNER_OS"
+          echo "📦 Building ERP and FACE React apps on $RUNNER_OS"
 
-          # === SCHOOL BUILD ===
-          cd SCHOOL/client
+          # === ERP BUILD ===
+          cd ERP/client
 
           if [[ "$RUNNER_OS" == "Windows" ]]; then
             echo "🪟 Installing Bun on Windows..."
@@ -73,7 +73,7 @@ jobs:
             export PATH="$BUN_INSTALL/bin:$PATH"
           fi
 
-          echo "⚙️ Installing dependencies & building SCHOOL..."
+          echo "⚙️ Installing dependencies & building ERP..."
           "$BUN_INSTALL/bin/bun" install --no-save
           "$BUN_INSTALL/bin/bun" run build
 
@@ -89,7 +89,7 @@ jobs:
       # 5️⃣ Build and Publish Infodazz Face app
       - name: 🏫 Build Infodazz Face
         run: |
-          echo "🚀 Building Infodazz School for ${{ matrix.os }}"
+          echo "🚀 Building Infodazz Erp for ${{ matrix.os }}"
           cd electron
           npx electron-builder --config electron-builder-face.yml --publish always
         env:
