@@ -1,4 +1,4 @@
-name: 🏗️ Build and Release Infodazz Face & School (from infodazz_school/arun-dev)
+name: 🏗️ Build and Release Infodazz Face & School (from infodazz_erp/arun-dev)
 
 on:
   workflow_dispatch:
@@ -28,7 +28,7 @@ jobs:
       - name: 📦 Checkout School Source Code
         uses: actions/checkout@v4
         with:
-          repository: kittle-arunkarthik/infodazz_school
+          repository: kittle-arunkarthik/infodazz_erp
           ref: arun-dev
           token: ${{ secrets.SOURCE_REPO_TOKEN }}
           fetch-depth: 0
