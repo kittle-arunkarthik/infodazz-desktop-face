@@ -1,4 +1,4 @@
-name: 🏗️ Build and Release Infodazz Face & Erp (from infodazz_erp/arun-dev)
+name: 🏗️ Build and Release Infodazz Face & Erp (from infodazz_erp/release)
 
 on:
   workflow_dispatch:
@@ -24,12 +24,12 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      # 1️⃣ Checkout SOURCE CODE (from RVK repo, branch arun-dev-2)
+      # 1️⃣ Checkout SOURCE CODE (from RVK repo, branch release-2)
       - name: 📦 Checkout Erp Source Code
         uses: actions/checkout@v4
         with:
           repository: kittle-arunkarthik/infodazz_erp
-          ref: arun-dev
+          ref: release
           token: ${{ secrets.SOURCE_REPO_TOKEN }}
           fetch-depth: 0
 
