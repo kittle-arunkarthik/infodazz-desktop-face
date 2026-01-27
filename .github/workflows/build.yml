@@ -24,7 +24,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      # 1️⃣ Checkout SOURCE CODE (from RVK repo, branch release-2)
+      # 1️⃣ Checkout SOURCE CODE (from ERP repo, branch release-2)
       - name: 📦 Checkout Erp Source Code
         uses: actions/checkout@v4
         with:
