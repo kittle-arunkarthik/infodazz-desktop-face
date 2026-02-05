@@ -73,6 +73,8 @@ jobs:
             export PATH="$BUN_INSTALL/bin:$PATH"
           fi
 
+          export NODE_OPTIONS="--max-old-space-size=6144"
+
           echo "⚙️ Installing dependencies & building ERP..."
           "$BUN_INSTALL/bin/bun" install --no-save
           "$BUN_INSTALL/bin/bun" run build
