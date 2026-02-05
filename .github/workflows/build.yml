@@ -76,13 +76,13 @@ jobs:
           export NODE_OPTIONS="--max-old-space-size=6144"
 
           echo "⚙️ Installing dependencies & building ERP..."
-          "$BUN_INSTALL/bin/bun" install --no-save
+          "$BUN_INSTALL/bin/bun" install --no-save --force
           "$BUN_INSTALL/bin/bun" run build
 
           # === FACE BUILD ===
           cd ../../FACE/client
           echo "⚙️ Installing dependencies & building FACE..."
-          npm ci || npm install
+          npm ci || npm install --force
           npm run build
 
           # Back to electron folder
